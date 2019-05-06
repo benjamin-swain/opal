@@ -15,7 +15,7 @@ print(data[0].shape)
 num_inputs = len(data[0])
 num_outputs = len(labels[0])
 
-# Aech stuff
+# Aech stuffs
 input_vector = Input(shape=(num_inputs,))
 
 input_layer = Dense(64, activation='tanh')(input_vector)
