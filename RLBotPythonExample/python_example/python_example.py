@@ -1,11 +1,11 @@
 import math
 import pygame
-import neurolab as nl
-from pprint import pprint
+#import neurolab as nl
+import numpy as np
 
 from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
 from rlbot.utils.structures.game_data_struct import GameTickPacket
-from rlbot.agents.human.controller_input import controller
+# from rlbot.agents.human.controller_input import controller
 
 
 class PythonExample(BaseAgent):
@@ -15,8 +15,22 @@ class PythonExample(BaseAgent):
 		self.controller_state = SimpleControllerState()
 		
 		# load nn
-		self.nn = nl.load('rl_nn.net')
-		
+		# NEUROLAB
+		# self.nn = nl.load('rl_nn.net')
+
+		# Keras
+		from keras.models import model_from_json
+		from keras.optimizers import Adam
+		json_file = open('model.json', 'r')
+		loaded_model_json = json_file.read()
+		json_file.close()
+		self.loaded_model = model_from_json(loaded_model_json)
+		# load weights into new model
+		self.loaded_model.load_weights("model.h5")
+		self.loaded_model.compile(optimizer=Adam(), loss='categorical_crossentropy')
+		# print("Loaded model from disk")
+
+
 		#persistent count
 		self.count = 1
 		
@@ -150,21 +164,39 @@ class PythonExample(BaseAgent):
 		# if self.count > 220:
 			# self.controller_state.jump = 0
 			# self.count = 1
-			
-		# Test new method of receiving controller vals
-		controls = controller.get_output()
-		print(controls.throttle)
-		
-			
-		self.controller_state.throttle = 1.0
-		self.controller_state.steer = turn
+
+
+		# self.controller_state.throttle = 1.0
+		# self.controller_state.steer = turn
 		#self.controller_state.steer = 0.6
 		#self.controller_state.yaw = 0.49
 		
 		# NEURAL NET CONTROLS
+		# NEUROLAB
 		# print(input_list)
-		controls = self.nn.sim([input_list])
+		# controls = self.nn.sim([input_list])
 		# print(controls)
+
+		# KERAS
+		# evaluate loaded model on test data
+		out_controls = self.loaded_model.predict(np.array([input_list]))
+		# h_throttle, h_steer, h_pitch, h_roll, h_jump, h_boost, h_brake
+		nn_throttle = out_controls[0][0][0]
+		nn_steer = out_controls[0][0][1]
+		nn_pitch = out_controls[0][0][2]
+		nn_roll = out_controls[0][0][3]
+		nn_jump = round(out_controls[1][0][0])
+		nn_boost = round(out_controls[1][0][1])
+		nn_brake = round(out_controls[1][0][2])
+
+		self.controller_state.throttle = nn_throttle
+		self.controller_state.steer = nn_steer
+		self.controller_state.pitch = nn_pitch
+		self.controller_state.yaw = nn_steer
+		self.controller_state.roll = nn_roll
+		self.controller_state.jump = nn_jump
+		self.controller_state.boost = nn_boost
+		self.controller_state.brake = nn_brake
 
 		draw_debug(self.renderer, my_car, packet.game_ball, action_display)
 

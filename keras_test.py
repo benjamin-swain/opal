@@ -10,6 +10,12 @@ text = np.loadtxt("nn_data.txt")
 data = text[:, 0:26]
 labels = text[:, 26:]
 
+labels_float = text[:, 26:30]
+labels_bool = text[:, 30:]
+
+print(labels_float[0])
+print(labels_bool[0])
+
 print(data[0].shape)
 
 num_inputs = len(data[0])
@@ -43,14 +49,15 @@ input_vector = Input(shape=(num_inputs,))
 # 2 output layers
 input_layer = Dense(64, activation='tanh')(input_vector)
 hidden_layer = Dense(64, activation='tanh')(input_layer)
-output_layer = Dense(num_output_floats, activation='linear')(hidden_layer)
+output_layer = Dense(num_output_floats, activation='tanh')(hidden_layer)
 output_layer2 = Dense(num_output_bools, activation='softmax')(hidden_layer)
 
 model = Model(inputs=[input_vector], outputs=[output_layer, output_layer2])
 model.compile(optimizer=Adam(), loss='categorical_crossentropy')
 
 # model.fit(data, labels, validation_data, epochs=100, batch_size=32)
-model.fit(data, labels, epochs=5, batch_size=32)
+# model.fit(data, labels, epochs=5, batch_size=32)
+model.fit(data, [labels_float, labels_bool], epochs=5, batch_size=32)
 
 output = model.predict(np.array([[2047.840,2559.720,17.010,-0.297,-2.354,0.000,-12.581,-21.981,0.191,-0.001,-0.001,0.187,1.000,0.000,0.000,0.000,0.000,0.000,0.000,92.740,0.000,0.000,0.000,0.000,0.000,0.000]]))
 # evaluate the model
