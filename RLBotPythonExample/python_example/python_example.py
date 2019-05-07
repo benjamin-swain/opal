@@ -1,9 +1,11 @@
 import math
 import pygame
 import neurolab as nl
+from pprint import pprint
 
 from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
 from rlbot.utils.structures.game_data_struct import GameTickPacket
+from rlbot.agents.human.controller_input import controller
 
 
 class PythonExample(BaseAgent):
@@ -149,6 +151,9 @@ class PythonExample(BaseAgent):
 			# self.controller_state.jump = 0
 			# self.count = 1
 			
+		# Test new method of receiving controller vals
+		controls = controller.get_output()
+		print(controls.throttle)
 		
 			
 		self.controller_state.throttle = 1.0
@@ -159,7 +164,7 @@ class PythonExample(BaseAgent):
 		# NEURAL NET CONTROLS
 		# print(input_list)
 		controls = self.nn.sim([input_list])
-		print(controls)
+		# print(controls)
 
 		draw_debug(self.renderer, my_car, packet.game_ball, action_display)
 

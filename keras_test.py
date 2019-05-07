@@ -13,15 +13,38 @@ labels = text[:, 26:]
 print(data[0].shape)
 
 num_inputs = len(data[0])
-num_outputs = len(labels[0])
+# num_outputs = len(labels[0])
+
+num_output_floats = 4
+num_output_bools = 3
 
 # Aech stuffs
 input_vector = Input(shape=(num_inputs,))
 
+# 1 output layer
+# input_layer = Dense(64, activation='tanh')(input_vector)
+# hidden_layer = Dense(64, activation='tanh')(input_layer)
+# output_layer = Dense(num_outputs, activation='linear')(hidden_layer)
+
+
+
+# Aech example code
+# inp = Input(shape=...)
+# hidden1 = Dense(num_neurons0, activation='tanh')(inp)
+# hidden2 = Dense(num_neurons1, activation='tanh')(hidden1)
+# output1 = Dense(num_continuous_values, activation='linear')(hidden2)
+# output2 = Dense(num_binary_values, activation='softmax')(hidden2)
+#
+# model = Model(inputs=(inp), outputs=(output1, output2))
+
+
+
+
+# 2 output layers
 input_layer = Dense(64, activation='tanh')(input_vector)
 hidden_layer = Dense(64, activation='tanh')(input_layer)
-output_layer = Dense(num_outputs, activation='linear')(hidden_layer)
-output_layer2 = Dense(num_outputs, activation='linear')(hidden_layer)
+output_layer = Dense(num_output_floats, activation='linear')(hidden_layer)
+output_layer2 = Dense(num_output_bools, activation='softmax')(hidden_layer)
 
 model = Model(inputs=[input_vector], outputs=[output_layer, output_layer2])
 model.compile(optimizer=Adam(), loss='categorical_crossentropy')
